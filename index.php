@@ -16,7 +16,7 @@ if (isset($_POST['login'])) {
     } elseif ($_POST['id'] == 'kurozemu' && $_POST['password'] == 'miura0313') {
         //くろぜむ農園の画面へ遷移
         $_SESSION["USER"] = 'kurozemu';
-        header("Location: farm_graph.php");
+        header("Location: http://160.16.239.88/farm/farm_main.php");
         exit;
     } else {
         $message = 'IDかPWが間違っています。';
@@ -35,7 +35,7 @@ if (isset($_POST['login'])) {
 <body>
     <h1>ログイン</h1>
     <p style="color: red"><?php echo $message ?></p>
-    <form method="post" action="common_index.php">
+    <form method="post" action="index.php">
         <label for="email">ユーザーID</label>
         <input id="id" type="id" name="id">
         <br>
