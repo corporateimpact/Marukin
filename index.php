@@ -18,6 +18,11 @@ if (isset($_POST['login'])) {
         $_SESSION["USER"] = 'kurozemu';
         header("Location: http://160.16.239.88/farm/farm_main.php");
         exit;
+    } elseif ($_POST['user'] == 'ksfoods' && $_POST['pass'] == 'ksfoods0430') {
+        //くろぜむ農園の画面へ遷移
+        $_SESSION["USER"] = 'ksfoods';
+        header("Location: http://160.16.239.88/ks-foods/main.php");
+        exit;
     } else {
         $message = 'IDかPWが間違っています。';
     }
