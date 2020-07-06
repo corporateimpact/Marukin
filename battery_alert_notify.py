@@ -40,7 +40,11 @@ b_low_limit = 11.5
 # << 30分前の時刻を取得 >>
 #BEFORE_30min = format(datetime.datetime.fromtimestamp(time.time() - 1800))[:19]
 BEFORE_30min = format(
+<<<<<<< HEAD
     datetime.datetime.fromtimestamp(time.time() - 86400))[:19]
+=======
+    datetime.datetime.fromtimestamp(time.time() - 1800))[:19]
+>>>>>>> master
 print("BEFORE_30min =" + BEFORE_30min)
 
 # << Text-File Open >>
@@ -77,10 +81,17 @@ def get_line_token():
     """
     # グローバル変数に代入するために宣言
     global line_token
+<<<<<<< HEAD
 
     # データベース接続処理
     connect_database_common()
 
+=======
+
+    # データベース接続処理
+    connect_database_common()
+
+>>>>>>> master
     # 共通データベースのカーソルを取得
     line_cur = common_pj.cursor()
     line_cur.execute(
@@ -103,6 +114,7 @@ def LINE_notify(str_message):
 
     #LINEトークン取得処理
     get_line_token()
+<<<<<<< HEAD
 
     headers = {"Authorization": "Bearer " + line_token}
     print(line_message)
@@ -111,8 +123,21 @@ def LINE_notify(str_message):
     r = requests.post(url, headers=headers, params=payload)
 
 # -----< LINE notify Function definition-End >-----
+=======
+
+    headers = {"Authorization": "Bearer " + line_token}
+    print(line_message)
+    payload = {"message":  line_message}
+>>>>>>> master
+
+    r = requests.post(url, headers=headers, params=payload)
+
+<<<<<<< HEAD
+=======
+# -----< LINE notify Function definition-End >-----
 
 
+>>>>>>> master
 # ---< 2020/04/15 update-start >--
 if format(FILE_TIMESTAMP) > format(BEFORE_30min):  # 計測が停止しているか判定
     # 最新の測定値なのでしきい値のチェックを行う
@@ -167,6 +192,7 @@ if format(FILE_TIMESTAMP) > format(BEFORE_30min):  # 計測が停止している
     else:
         print("前回の状態を継続中")
 else:  # 計測が停止している可能性あり
+<<<<<<< HEAD
     if a_info != "UNAVAILABLE":
         # LINE alert
         line_message = line_message + "\n計測が停止しています。"
@@ -174,6 +200,16 @@ else:  # 計測が停止している可能性あり
         # alertinfo.ini update("******" --> "UNAVAILABLE")
         with open(Path_alertinfo, mode="w") as alertinfo_w:
             alertinfo_w.write("UNAVAILABLE")
+=======
+    pass
+#    if a_info != "UNAVAILABLE":
+#        # LINE alert
+#        line_message = line_message + "\n計測が停止しています。"
+#        LINE_notify(line_message)  # LINE to message send
+#        # alertinfo.ini update("******" --> "UNAVAILABLE")
+#        with open(Path_alertinfo, mode="w") as alertinfo_w:
+#            alertinfo_w.write("UNAVAILABLE")
+>>>>>>> master
 
 
 # ---< 2020/04/15 update-end >--
