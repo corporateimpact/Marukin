@@ -11,17 +11,17 @@ if (isset($_POST['login'])) {
     if ($_POST['user'] == 'user' && $_POST['pass'] == 'password') {
         //マルキンユーザの場合、マルキンの画面に遷移する
         $_SESSION["USER"] = 'user';
-        header("Location: http://moni-sys.com/main.php");
+        header("Location: http://www.moni-sys.com/main.php");
         exit;
     } elseif ($_POST['user'] == 'kurozemu' && $_POST['pass'] == 'miura0313') {
         //くろぜむ農園の画面へ遷移
         $_SESSION["USER"] = 'kurozemu';
-        header("Location: http://moni-sys.com/farm/farm_main.php");
+        header("Location: http://www.moni-sys.com/farm/farm_main.php");
         exit;
     } elseif ($_POST['user'] == 'ksfoods' && $_POST['pass'] == 'ksfoods0430') {
         //くろぜむ農園の画面へ遷移
         $_SESSION["USER"] = 'ksfoods';
-        header("Location: http://moni-sys.com/ks-foods/main.php");
+        header("Location: http://www.moni-sys.com/ks-foods/main.php");
         exit;
     } else {
         $message = 'IDかPWが間違っています。';
@@ -42,7 +42,7 @@ if (isset($_POST['login'])) {
 
 <body>
     <div id="login">
-        <form name='form-login' method="post" action="index.php">
+        <form name='form-login' method="post" action="index_dev.php">
             <span class="fontawesome-user"></span>
             <input type="text" id="user" name="user" placeholder="Username">
 
