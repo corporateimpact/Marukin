@@ -23,7 +23,7 @@ if (isset($_POST['login'])) {
         $_SESSION["USER"] = 'ksfoods';
         header("Location: http://www.moni-sys.com/ks-foods/main.php");
         exit;
-    } elseif ($_POST['user'] == 'natsumoto' && $_POST['pass'] == 'natsumoto0821') {
+    } elseif ($_POST['user'] == 'natsumoto' && $_POST['pass'] == 'natsumoto0831') {
         //くろぜむ農園の画面へ遷移
         $_SESSION["USER"] = 'natsumoto';
         header("Location: http://www.moni-sys.com/natsumoto/main.php");
