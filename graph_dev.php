@@ -51,18 +51,18 @@ if(isset($_GET['time'])){
 }
 $dArray;
 
-if(file_exists("/var/www/html/infos/" . $dateStr . ".dat")){
-	$data = File("/var/www/html/infos/" . $dateStr . ".dat");
-	$label;
-	$temperature;
-	$humidity;
-	$water_temp;
-	foreach($data as $row){
-		$row = preg_replace("/\n/","",$row);
-		$tmp = explode(",",$row);
-		$dArray{str_replace(":","",$tmp[0])} = $tmp;
-	}
-}
+//if(file_exists("/var/www/html/infos/" . $dateStr . ".dat")){
+//	$data = File("/var/www/html/infos/" . $dateStr . ".dat");
+//	$label;
+//	$temperature;
+//	$humidity;
+//	$water_temp;
+//	foreach($data as $row){
+//		$row = preg_replace("/\n/","",$row);
+//		$tmp = explode(",",$row);
+//		$dArray{str_replace(":","",$tmp[0])} = $tmp;
+//	}
+//}
 $max =  array_fill(1, 10, -999);
 $min =  array_fill(1, 10, 999);
 $data = array();
@@ -221,6 +221,10 @@ function onList(){
 	aForm.action = "list.php";
 	aForm.submit();
 }
+function onLive(){
+	aForm.action = "http://210.156.171.241:5000 ";
+	aForm.submit();
+}
 
 
 
@@ -247,7 +251,7 @@ select.ui-datepicker-month{
 <td>
 <form action="main.php" method="post" name="aForm">
 <input type="text" name="date" id="xxdate" readonly="readonly" value="<?php echo $org_date; ?>">
-<input type="button" value="　映像　" onClick="goMovie();"><input type="button" value="　グラフ　" onClick="onGraph();"><input type="button" value="銀鮭養殖日報" onClick="onList();">
+<input type="button" value="　映像　" onClick="goMovie();"><input type="button" value="　グラフ　" onClick="onGraph();"><input type="button" value="銀鮭養殖日報" onClick="onList();"><input type="button" value="ライブ映像" onClick="onLive();">
 </form>
 </td><td>
 <!--form method="post" action="setting.php" target="main">
