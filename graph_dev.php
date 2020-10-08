@@ -251,7 +251,7 @@ select.ui-datepicker-month{
 <td>
 <form action="main.php" method="post" name="aForm">
 <input type="text" name="date" id="xxdate" readonly="readonly" value="<?php echo $org_date; ?>">
-<input type="button" value="　映像　" onClick="goMovie();"><input type="button" value="　グラフ　" onClick="onGraph();"><input type="button" value="銀鮭養殖日報" onClick="onList();"><input type="button" value="ライブ映像" onClick="onLive();">
+<input type="button" value="　映像　" onClick="goMovie();"><input type="button" value="　グラフ　" onClick="onGraph();"><input type="button" value="銀鮭養殖日報" onClick="onList();"><a href="http://210.156.171.241:5000" target="_blank" rel="noopener noreferrer">ライブ映像</a>
 </form>
 </td><td>
 <!--form method="post" action="setting.php" target="main">
