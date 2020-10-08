@@ -11,6 +11,18 @@ if(isset($_POST['logout'])){
     exit;
 }
 
+//20201010 袰岩追記
+$db_host      = "localhost";
+$db_user      = "root";
+$db_pass      = "pm#corporate1";
+$set_database = "marukin";
+$data_db      = "data";
+$column_day   = "days";         // 主キー1
+$column_time  = "times";        // 主キー2
+
+
+
+
 $dateStr = date("Ymd");
 $timeStr = date("Hi00");
 if(isset($_POST['date'])){
@@ -84,6 +96,70 @@ for($i=0;$i<1440;$i++){
 		}
 	}
 }
+
+//
+// MySQLより該当日の測定値(平均)を取得（グラフ表示で使用）
+$mysqli = new mysqli($db_host, $db_user, $db_pass, $set_database);
+$sql = "select substring(date_format(" . $column_time . ",'%H:%i:%s'),1,8) AS JIKAN, electric_info, battery_info, battery_temp, controller_temp from ";
+$sql = $sql . $data_db ." where " . $column_day . " = '";
+$sql = $sql . str_replace("/", "-", $org_date);
+$sql = $sql . "' group by substring(date_format(" . $column_time . ",'%H:%i:%s'),1,8) order by JIKAN";
+$res = $mysqli->query($sql);
+// 以下はDB内容によって変更
+$electric_info = "";     //パネル発電量
+$battery_info = "";      //バッテリー電圧
+$battery_temp = "";      //バッテリー温度
+$controller_temp = "";   //コントローラー温度
+
+$i_next = 0;    //時間　MAX24
+$j_next = 0;    //10分毎　MAX5回分（50分）
+while ($row = $res->fetch_array()) {
+    for ($i = $i_next; $i < 25; $i++) {   //24時まで　
+    for ($j = $j_next; $j < 6; $j++) {    //50分まで
+        if (substr($row[0], 0, 2) == $i and substr($row[0], 3, 1) == $j) {
+        // 以下はDB内容によって変更
+        $electric_info = $electric_info . $row[1] . ",";
+        $battery_info = $battery_info . $row[2] . ",";
+        $battery_temp = $battery_temp . $row[3] . ",";
+        $controller_temp = $controller_temp . $row[4] . ",";
+
+        if ($j == 5) {                    //50分まで来たらゼロにする
+            $j_next = 0;
+            $i_next = $i + 1;
+        } else {
+            $j_next = $j + 1;
+            $i_next = $i;
+        }
+        break 2;
+        } elseif (substr($row[0], 0, 2) > $i) {
+        // 以下はDB内容によって変更
+        $electric_info = $electric_info . ",";
+        $battery_info = $battery_info . ",";
+        $battery_temp = $battery_temp . ",";
+        $controller_temp = $controller_temp . ",";
+
+        if ($j == 5) {                    //50分まで来たらゼロにする
+            $j_next = 0;
+        }
+        } elseif (substr($row[0], 0, 2) >= $i and substr($row[0], 3, 1) > $j) {
+        // 以下はDB内容によって変更
+        $electric_info = $electric_info . ",";
+        $battery_info = $battery_info . ",";
+        $battery_temp = $battery_temp . ",";
+        $controller_temp = $controller_temp . ",";
+
+        if ($j == 5) {                    //50分まで来たらゼロにする
+            $j_next = 0;
+        }
+        }
+    }
+    }
+}
+
+
+
+
+//
 $mainImg = "img/Noimage_image.png";
 if(file_exists("/var/www/html/images/" . $dateStr . "/" . $dateStr . "_" . $timeStr . ".jpg" )){
 	$mainImg = "images/" . $dateStr . "/" . $dateStr . "_" . $timeStr . ".jpg";
@@ -138,7 +214,7 @@ function goMovie(){
 	aForm.submit();
 }
 function onGraph(){
-	aForm.action = "graph.php";
+	aForm.action = "graph_dev.php";
 	aForm.submit();
 }
 function onList(){
@@ -287,7 +363,7 @@ var myChart = new Chart(ctx, {
     datasets: [{
       type: 'line',
       label: '発電量(W)',
-      data: [<?php echo $data[1]; ?>],
+      data: [<?php echo $electric_info; ?>],
       borderColor: "rgba(255, 241, 0,0.4)", 
       backgroundColor: "rgba(255, 241, 0,0.4)", 
       fill: true, // 中の色を抜く
@@ -295,7 +371,7 @@ var myChart = new Chart(ctx, {
     },
     {
       label: 'バッテリー残量(V)',
-      data: [<?php echo $data[2]; ?>],
+      data: [<?php echo $battery_info; ?>],
       borderColor: "rgba(228,0,127,0.4)", 
       backgroundColor: "rgba(228,0,127,0.4)",
       fill: false, // 中の色を抜く
@@ -315,7 +391,7 @@ var myChart = new Chart(ctx, {
     datasets: [{
       type: 'line',
       label: 'バッテリー温度(℃)',
-      data: [<?php echo $data[3]; ?>],
+      data: [<?php echo $battery_temp; ?>],
       borderColor: "rgba(25, 25, 112,0.4)", 
       backgroundColor: "rgba(25, 25, 112,0.4)", 
       fill: false, // 中の色を抜く
@@ -323,7 +399,7 @@ var myChart = new Chart(ctx, {
     },
     {
       label: 'コントローラー内部温度(℃)',
-      data: [<?php echo $data[4]; ?>],
+      data: [<?php echo $controller_temp; ?>],
       borderColor: "rgba(0, 100, 0,0.4)", 
       backgroundColor: "rgba(0,100,0,0.4)",
       fill: false, // 中の色を抜く

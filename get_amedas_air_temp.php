@@ -90,18 +90,18 @@ foreach( $_rawData as $_rawBlock ) {
         //データ成形
         $sc_time = $sc_time . ":00:00";
         $sc_date = date('Y-m-d');
-        echo "\n" . $sc_time . "\n";
+        //echo "\n" . $sc_time . "\n";
         $sc_date = '"' . $sc_date . '"';
         $sc_time = '"' . $sc_time . '"';
 
         //24時→0時として登録する
         $sc_time = str_replace("24", "00", $sc_time);
-        echo $sc_time . "\n";
+        //echo $sc_time . "\n";
 
         //ＭｙＳＱＬへ接続（DB_HOST, DB_USER, DB_PASS）
         $mysqli = new mysqli ($host_name, $user_name, $db_password, $db_name);
         if ($mysqli->connect_error) {
-            echo $mysqli->connect_error;
+            //echo $mysqli->connect_error;
             exit();
         }
         else {
@@ -110,7 +110,7 @@ foreach( $_rawData as $_rawBlock ) {
 
         //mysql構文 データ登録用
         $sql = 'replace into ' . $table_name . ' values (' .$sc_date . ', ' . $sc_time . ', "' . (float)$sc_temp . '");';
-        echo $sql;
+        //echo $sql;
         $mysqli_result = $mysqli->query($sql);
         if (!$mysqli_result) {
             die('insert fault'.mysql_error() . "\n");
