@@ -657,6 +657,17 @@ var complexChartOption = {
             gridLines: { // このオプションを追加
                 drawOnChartArea: false, 
             },
+        }, {
+            id: "y-axis-3",   // Y軸のID
+            type: "linear",   // linear固定
+            position: "left", // どちら側に表示される軸か？
+            ticks: {          // スケール
+                max: 40,
+                min: -10,
+                stepSize: 5
+            },
+            gridLines: { // このオプションを追加
+                drawOnChartArea: true,
         }],
     }
 };
@@ -686,7 +697,7 @@ var myChart = new Chart(ctx, {
       borderColor: "rgba(0, 100, 0,0.4)", 
       backgroundColor: "rgba(0,100,0,0.4)",
       fill: false, // 中の色を抜く
-      yAxisID: "y-axis-1",
+      yAxisID: "y-axis-3",
     },
     {
       label: 'DO',
