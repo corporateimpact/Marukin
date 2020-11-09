@@ -92,6 +92,7 @@ if(file_exists("/var/www/html/jma/" . $dateStr . ".dat")){
 //AMeDAS気温の格納処理ここまで
 //
 //202011袰岩追加 AMeDASからのデータ処理
+$mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'ksfoods');
 $sql2 = "select substring(date_format(times,'%H:%i'),1,4) AS JIKAN, round(air_temp, 1) as temp from amedas_temp where days = '";
 $sql2 = $sql2 . str_replace("/", "-", $org_date);
 $sql2 = $sql2 . "' group by substring(date_format(times,'%H:%i'),1,4) order by JIKAN;";
@@ -233,6 +234,10 @@ $mainImg = "img/Noimage_image.png";
 if(file_exists("/var/www/html/images/" . $dateStr . "/" . $dateStr . "_" . $timeStr . ".jpg" )){
 	$mainImg = "images/" . $dateStr . "/" . $dateStr . "_" . $timeStr . ".jpg";
 }
+
+// 接続終了
+$mysqli->close();
+
 ?>
 <!DOCTYPE html>
 <html>
