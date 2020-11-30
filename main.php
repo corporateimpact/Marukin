@@ -4,13 +4,14 @@ session_start();
 //    header('Location: index.php');
 //    exit;
 //}
-
+// 仕様変更後未使用
 function get_do($str1,$str2){
 	$T = floatval($str1);
 	$OP = floatval($str2);
 	$S  = 35;
 
 	$A1 = -173.4292;
+	$A2 = 249.6339;
 	$A2 = 249.6339;
 	$A3 = 143.3483;
 	$A4 = -21.8492;
@@ -29,6 +30,7 @@ function get_do($str1,$str2){
 
 	return $OM;
 }
+// 仕様変更後未使用
 
 if(isset($_POST['logout'])){
     session_destroy();
@@ -62,18 +64,115 @@ if(isset($_GET['time'])){
 		$timeStr = str_replace(":","",$_GET['time']);
 	}
 }
+//旧amedas気温DATの読み込み処理ここから
 $dArray;
 if(file_exists("/var/www/html/infos/" . $dateStr . ".dat")){
 	$data = File("/var/www/html/infos/" . $dateStr . ".dat");
 	$label;
 	$temperature;
 	$humidity;
-	$water_temp;
+	//$water_temp;
 	foreach($data as $row){
 		$tmp = explode(",",$row);
 		$dArray{str_replace(":","",$tmp[0])} = $tmp;
 	}
 }
+//格納処理
+if(file_exists("/var/www/html/jma/" . $dateStr . ".dat")){
+	$datas = File("/var/www/html/jma/" . $dateStr . ".dat");
+	//$label = $data[0];
+	$tmp = explode(",",$datas[1]);
+	$temperature = "";
+	foreach($tmp as $row){
+		for($i = 0;$i < 6;$i++){
+			$temperature .= $row . ",";
+		}
+	}
+}
+//AMeDAS気温の格納処理ここまで
+//
+//202011袰岩追加 AMeDASからのデータ処理
+$mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'marukin');
+$sql2 = "select substring(date_format(times,'%H:%i'),1,4) AS JIKAN, round(air_temp, 1) as temp from amedas_temp where days = '";
+$sql2 = $sql2 . str_replace("/", "-", $org_date);
+$sql2 = $sql2 . "' group by substring(date_format(times,'%H:%i'),1,4) order by JIKAN;";
+$res2 = $mysqli->query($sql2);
+$air_temp = "";            // 志津川気温
+
+$i_next = 0;
+$j_next = 0;
+while ($row2 = $res2->fetch_array()) {
+    for ($i = $i_next; $i < 25; $i++) {
+    for ($j = $j_next; $j < 6; $j++) {
+        if (substr($row2[0], 0, 2) == $i and substr($row2[0], 3, 1) == $j) {
+        $air_temp = $air_temp . $row2[1] . ",";
+        if ($j == 5) {
+            $j_next = 0;
+            $i_next = $i + 1;
+        } else {
+            $j_next = $j + 1;
+            $i_next = $i;
+        }
+        break 2;
+        } elseif (substr($row2[0], 0, 2) > $i) {
+        $air_temp = $air_temp . ",";
+        if ($j == 5) {
+            $j_next = 0;
+        }
+        } elseif (substr($row2[0], 0, 2) >= $i and substr($row2[0], 3, 1) > $j) {
+        $air_temp = $air_temp . ",";
+        if ($j == 5) {
+            $j_next = 0;
+        }
+        }
+    }
+    }
+}
+//
+
+//202011袰岩追加
+// MySQLより該当日の測定値(平均)を取得（グラフ表示で使用）
+$mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'marukin');
+$sql = "select substring(date_format(times,'%H:%i:%s'),1,8) AS JIKAN, do, water_temp from data where days = '";
+$sql = $sql . str_replace("/", "-", $org_date);
+$sql = $sql . "' group by substring(date_format(times,'%H:%i:%s'),1,8) order by JIKAN";
+$res = $mysqli->query($sql);
+$do = "";             //溶存酸素濃度
+$water_temp = "";
+
+$i_next = 0;    //時間　MAX24
+$j_next = 0;    //10分毎　MAX5回分（50分）
+while ($row = $res->fetch_array()) {
+    for ($i = $i_next; $i < 25; $i++) {   //24時まで　
+    for ($j = $j_next; $j < 6; $j++) {    //50分まで
+        if (substr($row[0], 0, 2) == $i and substr($row[0], 3, 1) == $j) {
+        $do = $do . $row[1] . ",";
+        $water_temp = $water_temp . $row[2] . ",";
+        if ($j == 5) {                    //50分まで来たらゼロにする
+            $j_next = 0;
+            $i_next = $i + 1;
+        } else {
+            $j_next = $j + 1;
+            $i_next = $i;
+        }
+        break 2;
+        } elseif (substr($row[0], 0, 2) > $i) {
+        $do = $do . ",";
+        $water_temp = $water_temp . ",";
+        if ($j == 5) {                    //50分まで来たらゼロにする
+            $j_next = 0;
+        }
+        } elseif (substr($row[0], 0, 2) >= $i and substr($row[0], 3, 1) > $j) {
+        $do = $do . ",";
+        $water_temp = $water_temp . ",";
+        if ($j == 5) {                    //50分まで来たらゼロにする
+            $j_next = 0;
+        }
+        }
+    }
+    }
+}
+//
 
 $data = array();
 
@@ -129,22 +228,16 @@ for($i=0;$i<1440;$i++){
 		}
 	}
 }
-if(file_exists("/var/www/html/jma/" . $dateStr . ".dat")){
-	$datas = File("/var/www/html/jma/" . $dateStr . ".dat");
-	//$label = $data[0];
-	$tmp = explode(",",$datas[1]);
-	$temperature = "";
-	foreach($tmp as $row){
-		for($i = 0;$i < 6;$i++){
-			$temperature .= $row . ",";
-		}
-	}
-}
+
 
 $mainImg = "img/Noimage_image.png";
 if(file_exists("/var/www/html/images/" . $dateStr . "/" . $dateStr . "_" . $timeStr . ".jpg" )){
 	$mainImg = "images/" . $dateStr . "/" . $dateStr . "_" . $timeStr . ".jpg";
 }
+
+// 接続終了
+$mysqli->close();
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -396,9 +489,13 @@ select.ui-datepicker-month{
  echo '</tr>';
 
 
- $do_val = explode(',',$data[6]);
- $water_temp_val = explode(',',$data[5]);
- $temp_val = explode(',',$temperature);
+ //$do_val = explode(',',$data[6]);
+ //$water_temp_val = explode(',',$data[5]);
+ //$temp_val = explode(',',$temperature);
+
+ $do_val = explode(',', $do);
+ $water_temp_val = explode(',', $water_temp);
+ $temp_val = explode(',', $air_temp);
 for ($i = 0;$i < 48; $i=$i+12){
 
     if ($i == 12 ) {  //１週間の平均値を表示する為
@@ -481,8 +578,8 @@ $hh = substr($timeStr,0,2);
 $m0 = substr($timeStr,2,1);
 for($i = 0;$i < 10;$i++){
 $mainImg = "img/Noimage_image.png";
-if(file_exists("/var/www/html/images/" . $dateStr . "/" . $dateStr . "_" . $hh . $m0 . $i . "00.jpg" )){
-	$mainImg = "images/" . $dateStr . "/" . $dateStr . "_" . $hh . $m0 . $i . "00.jpg";
+if(file_exists("/var/www/html/images/" . $dateStr . "/" . $dateStr . "_" . $hh . $m0 . $i . "00_mini.jpg" )){
+	$mainImg = "images/" . $dateStr . "/" . $dateStr . "_" . $hh . $m0 . $i . "00_mini.jpg";
 }
 
  ?>
@@ -509,8 +606,8 @@ $hh = str_pad($i, 2, 0, STR_PAD_LEFT);
  for($j=0;$j<6;$j++){
 $m0 = $j;
 $mainImg = "img/Noimage_image.png";
-if(file_exists("/var/www/html/images/" . $dateStr . "/" . $dateStr . "_" . $hh . $m0 . "000.jpg" )){
-	$mainImg = "images/" . $dateStr . "/" . $dateStr . "_" . $hh . $m0 . "000.jpg";
+if(file_exists("/var/www/html/images/" . $dateStr . "/" . $dateStr . "_" . $hh . $m0 . "000_mini.jpg" )){
+	$mainImg = "images/" . $dateStr . "/" . $dateStr . "_" . $hh . $m0 . "000_mini.jpg";
 }
   ?>
 <td>
@@ -580,7 +677,7 @@ var myChart = new Chart(ctx, {
     {
       type: 'line',
       label: '水温(-10m)',
-      data: [<?php echo $data[5]; ?>],
+      data: [<?php echo $water_temp; ?>],
       borderColor: "rgba(25, 25, 112,0.4)", 
       backgroundColor: "rgba(25, 25, 112,0.4)", 
       fill: false, // 中の色を抜く
@@ -589,7 +686,8 @@ var myChart = new Chart(ctx, {
     {
       type: 'line',
       label: '気温',
-      data: [<?php echo $temperature; ?>],
+      spanGaps: true,
+      data: [<?php echo $air_temp; ?>],
       borderColor: "rgba(0, 100, 0,0.4)", 
       backgroundColor: "rgba(0,100,0,0.4)",
       fill: false, // 中の色を抜く
@@ -597,7 +695,7 @@ var myChart = new Chart(ctx, {
     },
     {
       label: 'DO',
-      data: [<?php echo $data[6]; ?>],
+      data: [<?php echo $do; ?>],
       borderColor: "rgba(100, 100, 0,0.4)", 
       backgroundColor: "rgba(100,100,0,0.4)",
       fill: false, // 中の色を抜く

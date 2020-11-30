@@ -4,7 +4,7 @@ session_start();
 //    header('Location: index.php');
 //    exit;
 //}
-// 仕様変更後未使用
+
 function get_do($str1,$str2){
 	$T = floatval($str1);
 	$OP = floatval($str2);
@@ -30,7 +30,6 @@ function get_do($str1,$str2){
 
 	return $OM;
 }
-// 仕様変更後未使用
 
 if(isset($_POST['logout'])){
     session_destroy();
@@ -64,115 +63,21 @@ if(isset($_GET['time'])){
 		$timeStr = str_replace(":","",$_GET['time']);
 	}
 }
-//旧amedas気温DATの読み込み処理ここから
+//amedas気温DATの読み込み処理
 $dArray;
 if(file_exists("/var/www/html/infos/" . $dateStr . ".dat")){
 	$data = File("/var/www/html/infos/" . $dateStr . ".dat");
 	$label;
 	$temperature;
 	$humidity;
-	//$water_temp;
+	$water_temp;
 	foreach($data as $row){
 		$tmp = explode(",",$row);
 		$dArray{str_replace(":","",$tmp[0])} = $tmp;
 	}
 }
-//格納処理
-if(file_exists("/var/www/html/jma/" . $dateStr . ".dat")){
-	$datas = File("/var/www/html/jma/" . $dateStr . ".dat");
-	//$label = $data[0];
-	$tmp = explode(",",$datas[1]);
-	$temperature = "";
-	foreach($tmp as $row){
-		for($i = 0;$i < 6;$i++){
-			$temperature .= $row . ",";
-		}
-	}
-}
-//AMeDAS気温の格納処理ここまで
-//
-//202011袰岩追加 AMeDASからのデータ処理
-$mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'marukin');
-$sql2 = "select substring(date_format(times,'%H:%i'),1,4) AS JIKAN, round(air_temp, 1) as temp from amedas_temp where days = '";
-$sql2 = $sql2 . str_replace("/", "-", $org_date);
-$sql2 = $sql2 . "' group by substring(date_format(times,'%H:%i'),1,4) order by JIKAN;";
-$res2 = $mysqli->query($sql2);
-$air_temp = "";            // 志津川気温
+//amedas気温DATの読み込み処理ここまで
 
-$i_next = 0;
-$j_next = 0;
-while ($row2 = $res2->fetch_array()) {
-    for ($i = $i_next; $i < 25; $i++) {
-    for ($j = $j_next; $j < 6; $j++) {
-        if (substr($row2[0], 0, 2) == $i and substr($row2[0], 3, 1) == $j) {
-        $air_temp = $air_temp . $row2[1] . ",";
-        if ($j == 5) {
-            $j_next = 0;
-            $i_next = $i + 1;
-        } else {
-            $j_next = $j + 1;
-            $i_next = $i;
-        }
-        break 2;
-        } elseif (substr($row2[0], 0, 2) > $i) {
-        $air_temp = $air_temp . ",";
-        if ($j == 5) {
-            $j_next = 0;
-        }
-        } elseif (substr($row2[0], 0, 2) >= $i and substr($row2[0], 3, 1) > $j) {
-        $air_temp = $air_temp . ",";
-        if ($j == 5) {
-            $j_next = 0;
-        }
-        }
-    }
-    }
-}
-//
-
-//202011袰岩追加
-// MySQLより該当日の測定値(平均)を取得（グラフ表示で使用）
-$mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'marukin');
-$sql = "select substring(date_format(times,'%H:%i:%s'),1,8) AS JIKAN, do, water_temp from data where days = '";
-$sql = $sql . str_replace("/", "-", $org_date);
-$sql = $sql . "' group by substring(date_format(times,'%H:%i:%s'),1,8) order by JIKAN";
-$res = $mysqli->query($sql);
-$do = "";             //溶存酸素濃度
-$water_temp = "";
-
-$i_next = 0;    //時間　MAX24
-$j_next = 0;    //10分毎　MAX5回分（50分）
-while ($row = $res->fetch_array()) {
-    for ($i = $i_next; $i < 25; $i++) {   //24時まで　
-    for ($j = $j_next; $j < 6; $j++) {    //50分まで
-        if (substr($row[0], 0, 2) == $i and substr($row[0], 3, 1) == $j) {
-        $do = $do . $row[1] . ",";
-        $water_temp = $water_temp . $row[2] . ",";
-        if ($j == 5) {                    //50分まで来たらゼロにする
-            $j_next = 0;
-            $i_next = $i + 1;
-        } else {
-            $j_next = $j + 1;
-            $i_next = $i;
-        }
-        break 2;
-        } elseif (substr($row[0], 0, 2) > $i) {
-        $do = $do . ",";
-        $water_temp = $water_temp . ",";
-        if ($j == 5) {                    //50分まで来たらゼロにする
-            $j_next = 0;
-        }
-        } elseif (substr($row[0], 0, 2) >= $i and substr($row[0], 3, 1) > $j) {
-        $do = $do . ",";
-        $water_temp = $water_temp . ",";
-        if ($j == 5) {                    //50分まで来たらゼロにする
-            $j_next = 0;
-        }
-        }
-    }
-    }
-}
-//
 
 $data = array();
 
@@ -229,15 +134,24 @@ for($i=0;$i<1440;$i++){
 	}
 }
 
+//AMeDAS気温の格納処理ここから
+if(file_exists("/var/www/html/jma/" . $dateStr . ".dat")){
+	$datas = File("/var/www/html/jma/" . $dateStr . ".dat");
+	//$label = $data[0];
+	$tmp = explode(",",$datas[1]);
+	$temperature = "";
+	foreach($tmp as $row){
+		for($i = 0;$i < 6;$i++){
+			$temperature .= $row . ",";
+		}
+	}
+}
+//AMeDAS気温の格納処理ここまで
 
 $mainImg = "img/Noimage_image.png";
 if(file_exists("/var/www/html/images/" . $dateStr . "/" . $dateStr . "_" . $timeStr . ".jpg" )){
 	$mainImg = "images/" . $dateStr . "/" . $dateStr . "_" . $timeStr . ".jpg";
 }
-
-// 接続終了
-$mysqli->close();
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -324,11 +238,11 @@ $(function() {
 });
 
 function goMovie(){
-	aForm.action = "main_dev.php";
+	aForm.action = "main.php";
 	aForm.submit();
 }
 function onGraph(){
-	aForm.action = "graph_dev.php";
+	aForm.action = "graph.php";
 	aForm.submit();
 }
 function onList(){
@@ -657,17 +571,6 @@ var complexChartOption = {
             gridLines: { // このオプションを追加
                 drawOnChartArea: false, 
             },
-        }, {
-            id: "y-axis-3",   // Y軸のID
-            type: "linear",   // linear固定
-            position: "left", // どちら側に表示される軸か？
-            ticks: {          // スケール
-                max: 40,
-                min: -10,
-                stepSize: 5
-            },
-            gridLines: { // このオプションを追加
-                drawOnChartArea: true,
         }],
     }
 };
@@ -684,7 +587,7 @@ var myChart = new Chart(ctx, {
     {
       type: 'line',
       label: '水温(-10m)',
-      data: [<?php echo $water_temp; ?>],
+      data: [<?php echo $data[5]; ?>],
       borderColor: "rgba(25, 25, 112,0.4)", 
       backgroundColor: "rgba(25, 25, 112,0.4)", 
       fill: false, // 中の色を抜く
@@ -693,15 +596,15 @@ var myChart = new Chart(ctx, {
     {
       type: 'line',
       label: '気温',
-      data: [<?php echo $air_temp; ?>],
+      data: [<?php echo $temperature; ?>],
       borderColor: "rgba(0, 100, 0,0.4)", 
       backgroundColor: "rgba(0,100,0,0.4)",
       fill: false, // 中の色を抜く
-      yAxisID: "y-axis-3",
+      yAxisID: "y-axis-1",
     },
     {
       label: 'DO',
-      data: [<?php echo $do; ?>],
+      data: [<?php echo $data[6]; ?>],
       borderColor: "rgba(100, 100, 0,0.4)", 
       backgroundColor: "rgba(100,100,0,0.4)",
       fill: false, // 中の色を抜く
