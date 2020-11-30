@@ -221,12 +221,6 @@ function onList(){
 	aForm.action = "list.php";
 	aForm.submit();
 }
-function onLive(){
-<a href="http://210.156.171.241:5000" >ライブ映像</a>
-	aForm.action = "http://210.156.171.241:5000" target="_blank" rel="noopener noreferrer";
-	aForm.submit();
-}
-
 
 
 </script>
