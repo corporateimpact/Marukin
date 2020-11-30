@@ -379,7 +379,10 @@ select.ui-datepicker-month{
 <td>
 <form action="main.php" method="post" name="aForm">
 <input type="text" name="date" id="xxdate" readonly="readonly" value="<?php echo $org_date; ?>">
-<input type="button" value="　映像　" onClick="goMovie();"><input type="button" value="　グラフ　" onClick="onGraph();"><input type="button" value="銀鮭養殖日報" onClick="onList();">
+<input type="button" value="　映像　" onClick="goMovie();">
+<input type="button" value="　グラフ　" onClick="onGraph();">
+<input type="button" value="銀鮭養殖日報" onClick="onList();">
+<input type="button" value=" ライブ映像 " onClick="window.open('http://210.156.171.241:5000','_blank');">
 </form>
 </td><td>
 <!--form method="post" action="setting.php" target="main">
