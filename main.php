@@ -37,7 +37,7 @@ if(isset($_POST['logout'])){
     header('Location: index.php');
     exit;
 }
-$org_date = "";
+$org_date = date("Ymd");
 $dateStr = date("Ymd");
 $timeStr = date("Hi00");
 if(isset($_POST['date'])){
