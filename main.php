@@ -459,7 +459,7 @@ select.ui-datepicker-month{
  echo '<table border="1" style="border-collapse: collapse" width=1240px>';
  echo '<tr>';
  echo '<td align="center" rowspan="2" style="font-size:small"  width="45">';
- echo date('Y/n/j',strtotime("-1 day")).'<br>～<br>'.date('Y/n/j',strtotime("-7 day")).'<br>の平均値';
+ echo date("Y/m/d", strtotime("-7 day", strtotime(str_replace("/", "-", $org_date)))). '<br>～<br>'.date("Y/m/d", strtotime("-1 day", strtotime(str_replace("/", "-", $org_date)))).'<br>の平均値';
  echo '</td>';
  echo '<td align="center" rowspan="2" style="border-top-style: hidden" width="3"></td>';
 
