@@ -37,7 +37,7 @@ if(isset($_POST['logout'])){
     header('Location: index.php');
     exit;
 }
-$org_date = "";
+$org_date = date("Ymd");
 $dateStr = date("Ymd");
 $timeStr = date("Hi00");
 if(isset($_POST['date'])){
@@ -235,6 +235,41 @@ if(file_exists("/var/www/html/images/" . $dateStr . "/" . $dateStr . "_" . $time
 	$mainImg = "images/" . $dateStr . "/" . $dateStr . "_" . $timeStr . ".jpg";
 }
 
+//20201208 *---平均値取得DB版---*
+//平均値を取得する　水温・DO
+$mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'marukin');
+$sql = "select round(avg(water_temp), 1) as wtemp, round(avg(do), 2) as Do from data where days < '";
+$sql = $sql . str_replace("/", "-", $org_date);
+$sql = $sql . "' group by days desc limit 7;";
+$resp = $mysqli->query($sql);
+$wtemp_week = "";
+$do_week = "";
+
+while ($rows = $resp->fetch_array()){
+    $wtemp_week[] = $rows["wtemp"];
+    $do_week[] = $rows["Do"];
+}
+//取得データの計算
+$water_temp_weekday = round(array_sum($wtemp_week) / count($wtemp_week), 1);
+$do_weekday = round(array_sum($do_week) / count($do_week), 1);
+
+//平均値を取得する　現地気温
+$mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'marukin');
+$sql = "select round(avg(air_temp), 1) as atemp from amedas_temp where days < '";
+$sql = $sql . str_replace("/", "-", $org_date);
+$sql = $sql . "' group by days desc limit 7;";
+$resp = $mysqli->query($sql);
+$wtemp_week = "";
+$do_week = "";
+
+while ($rows = $resp->fetch_array()){
+    $atemp_week[] = $rows["atemp"];
+}
+//取得データの計算
+$air_temp_weekday = round(array_sum($atemp_week) / count($atemp_week), 1);
+
+//*---平均値取得DB版終わり---*
+
 // 接続終了
 $mysqli->close();
 
@@ -401,52 +436,6 @@ select.ui-datepicker-month{
  echo '℃';
  echo '<br>';
 
-//----- 基準日から１週間の平均値(Do値・水温・気温)を取得　開始 -----2020-02-11
- $enddate = substr($dateStr,0,4).'/'.substr($dateStr,4,2).'/'.substr($dateStr,6,2);
- $date = new DateTime($enddate);
- $startdate = $date->modify('-6 days')->format('Y/m/d');
- $currentdate = $startdate;
- $datafiledir ="/home/upload/infos/";
- $water_temp_all = 0;
- $do_all = 0;
- $count = 0;
- while ($currentdate <= $enddate){  //１週間分の水温・DO値データを読み込む
-   $filename = $datafiledir.str_replace("/","",$currentdate).".dat";
-   $fh = fopen($filename,"r");
-   while ($line = fgets($fh)){
-     $data1 = explode(',',$line);
-     if ($data1[5] != 0 && $data1[6] != 0 ){
-       $water_temp_all = $water_temp_all + $data1[5];  //水温の積算
-       $do_all = $do_all + $data1[6];  //DO値の積算
-       $count++;
-     }
-   }
-   fclose($fh);
-   $date = new DateTime($currentdate);
-   $currentdate = $date->modify('+1 days')->format('Y/m/d');
- }
-//----- 気温ファイルの読み込み -----
- $datafiledir ="/var/www/html/jma/";
- $currentdate = $startdate;
- $air_temp_all = 0;
- $count_temp = 0;
- while ($currentdate <= $enddate){  //１週間分の水温・DO値データを読み込む
-   $filename = $datafiledir.str_replace("/","",$currentdate).".dat";
-   $fh = fopen($filename,"r");
-   $line = fgets($fh); //１行目は読み飛ばし
-   $line = fgets($fh); //２行目に24時間の気温データが入っている
-   $data1 = explode(',',$line);
-   for ($count2 = 0; $count2 < 24; $count2++){
-     if ($data1[$count2] <> ""){
-       $air_temp_all = $air_temp_all + $data1[$count2];  //気温の積算
-       $count_temp++;  //
-     }
-   }
-   fclose($fh);
-   $date = new DateTime($currentdate);
-   $currentdate = $date->modify('+1 days')->format('Y/m/d');
- }
-
 //echo "　開始日＝　".$startdate;
 //echo "　終了日＝　".$enddate;
 //echo "　水温合計＝　".$water_temp_all;
@@ -504,20 +493,20 @@ for ($i = 0;$i < 48; $i=$i+12){
     if ($i == 12 ) {  //１週間の平均値を表示する為
        echo '<td align="center" rowspan="4" width="45">';
        echo '水温　';
-       if ($count <> 0) {
-          echo number_format(round($water_temp_all/$count,1),1);
+       if (count($wtemp_week) <> 0) {
+          echo $water_temp_weekday;
        } else {
           echo '---';
        }
        echo '<br>気温　';
-       if ($count_temp <> 0) {
-          echo number_format(round($air_temp_all/$count_temp,1),1);
+       if (count($atemp_week) <> 0) {
+          echo $air_temp_weekday;
        } else {
           echo '---';
        }
        echo '<br>DO値　';
-       if ($count <> 0) {
-          echo number_format(round($do_all/$count,1),1);
+       if (count($do_week) <> 0) {
+          echo $do_weekday;
        } else {
           echo '---';
        }
