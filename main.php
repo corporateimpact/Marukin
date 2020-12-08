@@ -268,6 +268,7 @@ while ($rows = $resp->fetch_array()){
 //取得データの計算
 $air_temp_weekday = round(array_sum($atemp_week) / count($atemp_week), 1);
 
+
 //*---平均値取得DB版終わり---*
 
 // 接続終了
@@ -458,7 +459,7 @@ select.ui-datepicker-month{
  echo '<table border="1" style="border-collapse: collapse" width=1240px>';
  echo '<tr>';
  echo '<td align="center" rowspan="2" style="font-size:small"  width="45">';
- echo date('Y/n/j',strtotime($startdate)).'<br>～<br>'.date('Y/n/j',strtotime($enddate)).'<br>の平均値';
+ echo date('Y/n/j',strtotime("-1 day")).'<br>～<br>'.date('Y/n/j',strtotime("-7 day")).'<br>の平均値';
  echo '</td>';
  echo '<td align="center" rowspan="2" style="border-top-style: hidden" width="3"></td>';
 
