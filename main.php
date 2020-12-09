@@ -468,7 +468,11 @@ select.ui-datepicker-month{
 <input type="button" value="銀鮭養殖日報" onClick="onList();">
 <input type="button" value=" ライブ映像 " onClick="window.open('http://210.156.171.241:5000','_blank');">
 </form>
-</td><td>
+</td>
+<td>
+<form method="post" name="aForm_graph">
+<input type="button" value="グラフデータダウンロード" onClick="onDownload();"> <input type="text" name="date_from" id="xxdate2" readonly="readonly" value="<?php echo $org_date; ?>"> ～ <input type="text" name="date_to" id="xxdate3" readonly="readonly" value="<?php echo $org_date; ?>">
+</form>
 <!--form method="post" action="setting.php" target="main">
     <input type="submit" name="logout" value="設定">
 </form-->
@@ -479,9 +483,8 @@ select.ui-datepicker-month{
 </table>
 <hr>
 
-<form method="post" name="aForm_graph">
-<input type="button" value="グラフデータダウンロード" onClick="onDownload();"> <input type="text" name="date_from" id="xxdate2" readonly="readonly" value="<?php echo $org_date; ?>"> ～ <input type="text" name="date_to" id="xxdate3" readonly="readonly" value="<?php echo $org_date; ?>">
-</form>
+
+
 
 <?php echo substr($dateStr,0,4); echo'/'; echo substr($dateStr,4,2); echo'/'; echo substr($dateStr,6,2); echo '　';
 
