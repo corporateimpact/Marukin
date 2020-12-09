@@ -64,6 +64,40 @@ if(isset($_GET['time'])){
 		$timeStr = str_replace(":","",$_GET['time']);
 	}
 }
+
+$org_date2 = $dateStr;
+if (isset($_POST['date_from'])) {
+    if ($_POST['date_from'] != "") {
+        $dateStr = str_replace("/", "", $_POST['date_from']);
+        $org_date2 = $_POST['date_from'];
+        $timeStr = "000000";
+    }
+}
+
+if (isset($_GET['date_from'])) {
+    if ($_GET['date_from'] != "") {
+        $dateStr = str_replace("/", "", $_GET['date_from']);
+        $org_date2 = $_GET['date_from'];
+        $timeStr = "000000";
+    }
+}
+
+$org_date3 = $dateStr;
+if (isset($_POST['date_to'])) {
+    if ($_POST['date_to'] != "") {
+        $dateStr = str_replace("/", "", $_POST['date_to']);
+        $org_date3 = $_POST['date_to'];
+        $timeStr = "000000";
+    }
+}
+if (isset($_GET['date_to'])) {
+    if ($_GET['date_to'] != "") {
+        $dateStr = str_replace("/", "", $_GET['date_to']);
+        $org_date3 = $_GET['date_to'];
+        $timeStr = "000000";
+    }
+}
+
 //旧amedas気温DATの読み込み処理ここから
 $dArray;
 if(file_exists("/var/www/html/infos/" . $dateStr . ".dat")){
@@ -309,18 +343,18 @@ function viewVideo($url){
 }
 function entryVideo($str){
     $.ajax('entry.php',
-      {
-        type: 'get',
-        data: { str: $str },
-        dataType: 'html'
-      }
+        {
+            type: 'get',
+            data: { str: $str },
+            dataType: 'html'
+        }
     )
     .done(function(data) {
-      document.getElementById("cmdBox").innerHTML = "";
+        document.getElementById("cmdBox").innerHTML = "";
     })
     // 検索失敗時には、その旨をダイアログ表示
     .fail(function() {
-      document.getElementById("cmdBox").innerHTML = "";
+        document.getElementById("cmdBox").innerHTML = "";
     });
 
 }
@@ -332,31 +366,41 @@ function entryVideo($str){
 <!--単体フォーム用-->
 <script type="text/javascript">
 $(function() {
-  $("#xxdate").datepicker( {
-    changeYear: true,  // 年選択をプルダウン化
-    changeMonth: true  // 月選択をプルダウン化
-  } );
- 
-  // 日本語化
-  $.datepicker.regional['ja'] = {
-    closeText: '閉じる',
-    prevText: '<前',
-    nextText: '次>',
-    currentText: '今日',
-    monthNames: ['1月','2月','3月','4月','5月','6月',
-    '7月','8月','9月','10月','11月','12月'],
-    monthNamesShort: ['1月','2月','3月','4月','5月','6月',
-    '7月','8月','9月','10月','11月','12月'],
-    dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
-    dayNamesShort: ['日','月','火','水','木','金','土'],
-    dayNamesMin: ['日','月','火','水','木','金','土'],
-    weekHeader: '週',
-    dateFormat: 'yy/mm/dd',
-    firstDay: 0,
-    isRTL: false,
-    showMonthAfterYear: true,
-    yearSuffix: '年'};
-  $.datepicker.setDefaults($.datepicker.regional['ja']);
+    $("#xxdate").datepicker( {
+        changeYear: true,  // 年選択をプルダウン化
+        changeMonth: true  // 月選択をプルダウン化
+    } );
+
+    $("#xxdate2").datepicker({
+        changeYear: true, // 年選択をプルダウン化
+        changeMonth: true // 月選択をプルダウン化
+    });
+
+    $("#xxdate3").datepicker({
+        changeYear: true, // 年選択をプルダウン化
+        changeMonth: true // 月選択をプルダウン化
+    });
+
+// 日本語化
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy/mm/dd',
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
 });
 
 function goMovie(){
@@ -371,22 +415,26 @@ function onList(){
 	aForm.action = "list.php";
 	aForm.submit();
 }
+function onDownload() {
+aForm_graph.action = "csvdownload.php";
+aForm_graph.submit();
+}
 
 var playButton = function(){
     $.ajax('cmdBox.php',
-      {
-        type: 'get',
-        data: { date: <?php echo $dateStr; ?>,time: $times },
-        dataType: 'html'
-      }
+        {
+            type: 'get',
+            data: { date: <?php echo $dateStr; ?>,time: $times },
+            dataType: 'html'
+        }
     )
     .done(function(data) {
-      document.getElementById("cmdBox").innerHTML = data;
-      setTimeout(playButton, 1000);
+        document.getElementById("cmdBox").innerHTML = data;
+        setTimeout(playButton, 1000);
     })
     // 検索失敗時には、その旨をダイアログ表示
     .fail(function() {
-      document.getElementById("cmdBox").innerHTML = "";
+        document.getElementById("cmdBox").innerHTML = "";
     });
 } 
 playButton();
@@ -395,15 +443,15 @@ playButton();
 <style>
 /* 年プルダウンの変更 */
 select.ui-datepicker-year{
-  height: 2em!important;      /* 高さ調整 */
-  margin-right:5px!important; /* 「年」との余白設定 */
-  width:70px!important;       /* 幅調整 */
+    height: 2em!important;      /* 高さ調整 */
+    margin-right:5px!important; /* 「年」との余白設定 */
+    width:70px!important;       /* 幅調整 */
 }
 /* 月プルダウンの変更 */
 select.ui-datepicker-month{
-  height: 2em!important;      /* 高さ調整 */
-  margin-left:5px!important;  /* 「年」との余白設定 */
-  width:70px!important;       /* 幅調整 */
+    height: 2em!important;      /* 高さ調整 */
+    margin-left:5px!important;  /* 「年」との余白設定 */
+    width:70px!important;       /* 幅調整 */
 }
 </style>
 
@@ -430,12 +478,17 @@ select.ui-datepicker-month{
 </form>
 </table>
 <hr>
+
+<form method="post" name="aForm_graph">
+<input type="button" value="グラフデータダウンロード" onClick="onDownload();"> <input type="text" name="date_from" id="xxdate2" readonly="readonly" value="<?php echo $org_date; ?>"> ～ <input type="text" name="date_to" id="xxdate3" readonly="readonly" value="<?php echo $org_date; ?>">
+</form>
+
 <?php echo substr($dateStr,0,4); echo'/'; echo substr($dateStr,4,2); echo'/'; echo substr($dateStr,6,2); echo '　';
 
- $now = file_get_contents(dirname(__FILE__) . "/jma/now.dat");
- echo $now;
- echo '℃';
- echo '<br>';
+$now = file_get_contents(dirname(__FILE__) . "/jma/now.dat");
+echo $now;
+echo '℃';
+echo '<br>';
 
 //echo "　開始日＝　".$startdate;
 //echo "　終了日＝　".$enddate;
@@ -450,95 +503,94 @@ select.ui-datepicker-month{
 //----- 基準日から１週間の平均値(Do値・水温・気温)を取得　終了 -----2020-02-11
 
 
- echo '<canvas id="myChart" style="position: relative; width: 1240px; height : 160px"></canvas>';
+echo '<canvas id="myChart" style="position: relative; width: 1240px; height : 160px"></canvas>';
 
- echo '</div>';
- echo '<div style="padding:220px 0px 0px 0px;">';
+echo '</div>';
+echo '<div style="padding:220px 0px 0px 0px;">';
 
 //<*--測定値のリスト表示　開始---->
- echo '<table border="1" style="border-collapse: collapse" width=1240px>';
- echo '<tr>';
- echo '<td align="center" rowspan="2" style="font-size:small"  width="45">';
- echo date("Y/m/d", strtotime("-7 day", strtotime(str_replace("/", "-", $org_date)))). '<br>～<br>'.date("Y/m/d", strtotime("-1 day", strtotime(str_replace("/", "-", $org_date)))).'<br>の平均値';
- echo '</td>';
- echo '<td align="center" rowspan="2" style="border-top-style: hidden" width="3"></td>';
+echo '<table border="1" style="border-collapse: collapse" width=1240px>';
+echo '<tr>';
+echo '<td align="center" rowspan="2" style="font-size:small"  width="45">';
+echo date("Y/m/d", strtotime("-7 day", strtotime(str_replace("/", "-", $org_date)))). '<br>～<br>'.date("Y/m/d", strtotime("-1 day", strtotime(str_replace("/", "-", $org_date)))).'<br>の平均値';
+echo '</td>';
+echo '<td align="center" rowspan="2" style="border-top-style: hidden" width="3"></td>';
 
 
- echo '<td align="center" width="50">時刻</td>';
- echo '<td align="center" width="50">気温</td>';
- echo '<td align="center" width="50">水温</td>';
- echo '<td align="center" width="50">DO値</td>';
- echo '<td align="center" style="border-top-style: hidden" width="3"></td>';
- echo '<td align="center" width="50">時刻</td>';
- echo '<td align="center" width="50">気温</td>';
- echo '<td align="center" width="50">水温</td>';
- echo '<td align="center" width="50">DO値</td>';
- echo '<td align="center" style="border-top-style: hidden" width="3"></td>';
- echo '<td align="center" width="50">時刻</td>';
- echo '<td align="center" width="50">気温</td>';
- echo '<td align="center" width="50">水温</td>';
- echo '<td align="center" width="50">DO値</td>';
+echo '<td align="center" width="50">時刻</td>';
+echo '<td align="center" width="50">気温</td>';
+echo '<td align="center" width="50">水温</td>';
+echo '<td align="center" width="50">DO値</td>';
+echo '<td align="center" style="border-top-style: hidden" width="3"></td>';
+echo '<td align="center" width="50">時刻</td>';
+echo '<td align="center" width="50">気温</td>';
+echo '<td align="center" width="50">水温</td>';
+echo '<td align="center" width="50">DO値</td>';
+echo '<td align="center" style="border-top-style: hidden" width="3"></td>';
+echo '<td align="center" width="50">時刻</td>';
+echo '<td align="center" width="50">気温</td>';
+echo '<td align="center" width="50">水温</td>';
+echo '<td align="center" width="50">DO値</td>';
 
- echo '</tr>';
+echo '</tr>';
 
 
- //$do_val = explode(',',$data[6]);
- //$water_temp_val = explode(',',$data[5]);
- //$temp_val = explode(',',$temperature);
-
- $do_val = explode(',', $do);
- $water_temp_val = explode(',', $water_temp);
- $temp_val = explode(',', $air_temp);
+//$do_val = explode(',',$data[6]);
+//$water_temp_val = explode(',',$data[5]);
+//$temp_val = explode(',',$temperature);
+$do_val = explode(',', $do);
+$water_temp_val = explode(',', $water_temp);
+$temp_val = explode(',', $air_temp);
 for ($i = 0;$i < 48; $i=$i+12){
 
     if ($i == 12 ) {  //１週間の平均値を表示する為
-       echo '<td align="center" rowspan="4" width="45">';
-       echo '水温　';
-       if (count($wtemp_week) <> 0) {
-          echo $water_temp_weekday;
-       } else {
-          echo '---';
-       }
-       echo '<br>気温　';
-       if (count($atemp_week) <> 0) {
-          echo $air_temp_weekday;
-       } else {
-          echo '---';
-       }
-       echo '<br>DO値　';
-       if (count($do_week) <> 0) {
-          echo $do_weekday;
-       } else {
-          echo '---';
-       }
-       echo '</td>';
-       echo '<td align="center" rowspan="4" style="border-top-style:hidden ; border-bottom-style:hidden" width="3"></td>';
+        echo '<td align="center" rowspan="4" width="45">';
+        echo '水温　';
+        if (count($wtemp_week) <> 0) {
+            echo $water_temp_weekday;
+        } else {
+            echo '---';
+        }
+        echo '<br>気温　';
+        if (count($atemp_week) <> 0) {
+            echo $air_temp_weekday;
+        } else {
+            echo '---';
+        }
+        echo '<br>DO値　';
+        if (count($do_week) <> 0) {
+            echo $do_weekday;
+        } else {
+            echo '---';
+        }
+        echo '</td>';
+        echo '<td align="center" rowspan="4" style="border-top-style:hidden ; border-bottom-style:hidden" width="3"></td>';
     }
 
     echo '<tr>';
     $flg1 = "off";
     for ($j = 0;$j < 3; $j++){
         if ($flg1 == "on") {
-          echo '<td align="center" style="border-top-style:hidden ; border-bottom-style:hidden" width="3"></td>';
+            echo '<td align="center" style="border-top-style:hidden ; border-bottom-style:hidden" width="3"></td>';
 	}else{
-          $flg1 = "on";
+            $flg1 = "on";
         }
         $moment = ($i/6)+($j*8);
         echo '<td align="center" width="50">  '. $moment . ':00 </td>';  //時刻
         echo '<td align="center" width="50">  '. $temp_val[$i+($j*48)] . '</td>';  //気温
         echo '<td align="center" width="50">  ';  //水温
         if ((empty($water_temp_val[$i+($j*48)]) && $moment < date("G")) || (empty($water_temp_val[$i+($j*48)]) && $dateStr < date('Ymd')) ) {
-          echo '－';
+            echo '－';
         }else {
-          echo $water_temp_val[$i+($j*48)];
+            echo $water_temp_val[$i+($j*48)];
         }
         echo '</td>';
         echo '<td align="center" width="50">  ';  //DO値
         if ((empty($do_val[$i+($j*48)]) && $moment < date("G")) || (empty($do_val[$i+($j*48)]) && $dateStr < date('Ymd')) ) {
 
-          echo '－';
+            echo '－';
         }else {
-          echo $do_val[$i+($j*48)];
+            echo $do_val[$i+($j*48)];
         }
         echo '</td>';
     }
@@ -602,7 +654,7 @@ $mainImg = "img/Noimage_image.png";
 if(file_exists("/var/www/html/images/" . $dateStr . "/" . $dateStr . "_" . $hh . $m0 . "000_mini.jpg" )){
 	$mainImg = "images/" . $dateStr . "/" . $dateStr . "_" . $hh . $m0 . "000_mini.jpg";
 }
-  ?>
+?>
 <td>
 <a href="?date=<?php echo $dateStr; ?>&time=<?php echo $hh . $m0 ?>000"><img src="<?php echo $mainImg; ?>" width="85" height="48" border=1 style="margin-left:auto;margin-right:auto;"></a>
 </td>
@@ -663,49 +715,49 @@ var ctx = document.getElementById('myChart').getContext('2d');
 ctx.canvas.width = window.innerWidth - 20;
 ctx.canvas.height = 160;
 var myChart = new Chart(ctx, {
-  type: 'bar',
-  data: {
-    labels: [<?php echo $label; ?>],
-    datasets: [
-    {
-      type: 'line',
-      label: '水温(-10m)',
-      data: [<?php echo $water_temp; ?>],
-      borderColor: "rgba(25, 25, 112,0.4)", 
-      backgroundColor: "rgba(25, 25, 112,0.4)", 
-      fill: false, // 中の色を抜く
-      yAxisID: "y-axis-1",
+    type: 'bar',
+    data: {
+        labels: [<?php echo $label; ?>],
+        datasets: [
+        {
+            type: 'line',
+            label: '水温(-10m)',
+            data: [<?php echo $water_temp; ?>],
+            borderColor: "rgba(25, 25, 112,0.4)",
+            backgroundColor: "rgba(25, 25, 112,0.4)",
+            fill: false, // 中の色を抜く
+            yAxisID: "y-axis-1",
+        },
+        {
+            type: 'line',
+            label: '気温',
+            spanGaps: true,
+            data: [<?php echo $air_temp; ?>],
+            borderColor: "rgba(0, 100, 0,0.4)",
+            backgroundColor: "rgba(0,100,0,0.4)",
+            fill: false, // 中の色を抜く
+            yAxisID: "y-axis-1",
+        },
+        {
+            label: 'DO',
+            data: [<?php echo $do; ?>],
+            borderColor: "rgba(100, 100, 0,0.4)",
+            backgroundColor: "rgba(100,100,0,0.4)",
+            fill: false, // 中の色を抜く
+            yAxisID: "y-axis-2",
+        },
+        {
+            type: 'line',
+            label: 'DO（80％ライン）',
+            data: [80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80],
+            borderColor: "rgba(255, 9, 232, 1)",
+            backgroundColor: "rgba(255, 9, 232, 1)",
+            pointRadius: 0,
+            pointHoverRadius: 0,
+            fill: false, // 中の色を抜く
+            yAxisID: "y-axis-2",
+        }]
     },
-    {
-      type: 'line',
-      label: '気温',
-      spanGaps: true,
-      data: [<?php echo $air_temp; ?>],
-      borderColor: "rgba(0, 100, 0,0.4)", 
-      backgroundColor: "rgba(0,100,0,0.4)",
-      fill: false, // 中の色を抜く
-      yAxisID: "y-axis-1",
-    },
-    {
-      label: 'DO',
-      data: [<?php echo $do; ?>],
-      borderColor: "rgba(100, 100, 0,0.4)", 
-      backgroundColor: "rgba(100,100,0,0.4)",
-      fill: false, // 中の色を抜く
-      yAxisID: "y-axis-2",
-    },
-    {
-      type: 'line',
-      label: 'DO（80％ライン）',
-      data: [80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80],
-      borderColor: "rgba(255, 9, 232, 1)", 
-      backgroundColor: "rgba(255, 9, 232, 1)",
-      pointRadius: 0,
-      pointHoverRadius: 0,
-      fill: false, // 中の色を抜く
-      yAxisID: "y-axis-2",
-    }]
-  },
-  options: complexChartOption
+    options: complexChartOption
 });
 </script>
