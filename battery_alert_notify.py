@@ -30,12 +30,12 @@ line_message = "<< マルキン アラート >>"  # LINE通知のメッセージ
 
 # << file path >>
 # <マルキンサーバ>
-Path_batteryinfo = "/home/upload/infos/battery/batteryinfo.ini"
+Path_batteryinfo = "/home/upload/infos/battery/battery_info.ini"
 Path_alertinfo = "/home/upload/infos/battery/alertinfo.ini"
 
 # << Battery Boundary >>
 b_high_limit = 15.0
-b_low_limit = 11.5
+b_low_limit = 11.4
 
 # << 30分前の時刻を取得 >>
 #BEFORE_30min = format(datetime.datetime.fromtimestamp(time.time() - 1800))[:19]
