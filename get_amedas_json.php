@@ -45,7 +45,7 @@ if(0 <= $which && $which <= 3) {
 $url = "https://www.jma.go.jp/bosai/amedas/data/point/". $area_no. "/". $set_json_date. "_". $json_no. ".json";
 $json_get = file_get_contents($url);
 $json_data = json_decode($json_get, TRUE);
-$set = $json_data[$set_json_date. $which. "0000"];
+$set = $json_data[$set_json_date. $what. "0000"];
 $temp = $set["temp"];
 echo $set_sql_date. "\n";
 echo $set_sql_time. "\n";
