@@ -44,14 +44,14 @@ if(isset($_POST['date'])){
 	if($_POST['date'] != ""){
 		$dateStr = str_replace("/","",$_POST['date']);
 		$org_date = $_POST['date'];
-		$timeStr = "000000";
+		$timeStr = date("Hi00");
 	}
 }
 if(isset($_GET['date'])){
 	if($_GET['date'] != ""){
 		$dateStr = str_replace("/","",$_GET['date']);
 		$org_date = $_GET['date'];
-		$timeStr = "000000";
+		$timeStr = date("Hi00");
 	}
 }
 if(isset($_POST['time'])){
