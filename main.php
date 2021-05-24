@@ -131,7 +131,7 @@ $sql2 = "select substring(date_format(times,'%H:%i'),1,4) AS JIKAN, round(air_te
 $sql2 = $sql2 . str_replace("/", "-", $org_date);
 $sql2 = $sql2 . "' group by substring(date_format(times,'%H:%i'),1,4) order by JIKAN;";
 $res2 = $mysqli->query($sql2);
-$air_temp = "";            // 志津川気温
+$air_temp = "";            // 気温
 
 $i_next = 0;
 $j_next = 0;
@@ -486,11 +486,7 @@ select.ui-datepicker-month{
 
 
 
-<?php echo substr($dateStr,0,4); echo'/'; echo substr($dateStr,4,2); echo'/'; echo substr($dateStr,6,2); echo '　';
-
-$now = file_get_contents(dirname(__FILE__) . "/jma/now.dat");
-echo $now;
-echo '℃';
+<?php echo substr($dateStr,0,4); echo'/'; echo substr($dateStr,4,2); echo'/'; echo substr($dateStr,6,2);
 echo '<br>';
 
 //echo "　開始日＝　".$startdate;
