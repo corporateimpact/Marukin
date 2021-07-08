@@ -32,15 +32,15 @@
 
     //確認用
     echo "\n";
-    var_dump($do_average_days);
-    echo "\n". echo $org_date. "\n". $today_set_time. "\n". $today_set_do. "\n". $result. "\n";
+    //var_dump($do_average_days);
+    echo "\n". $org_date. "\n". $today_set_time. "\n". $today_set_do. "\n". $result. "\n";
     //確認用
 
     // 登録用構文準備
     $call = 'replace into do_average value("%s","%s","%s","%s");';
     $sql = sprintf($call, $org_date, $today_set_time, $today_set_do, $result);
-    echo $sql;
-    echo "\n";
+    //echo $sql;
+    //echo "\n";
     $res = $mysqli->query($sql);
 
 
