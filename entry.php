@@ -31,12 +31,20 @@
         $msg_log = date('[Y-m-d H:i:s]'). ' - ['. $tmp[1]. '.mp4] Request error.'. "\n";
         $log = fopen($logfile, 'a');
         fwrite($log, $msg_log);
+        fwrite($log, $opt. " \n");
         fclose($log);
     };
 
     $cmd = 'mv /home/upload/'. $tmp[1]. '.mp4 /home/upload/videos/'. $daytime[0]. '/'. $tmp[1]. '.mp4';
-    $msg_log = date('[Y-m-d'). ' '. time('H:M:S]'). ' - Finished.';
     exec($cmd, $opt, $return_ver);
+    if($return_ver===1){
+        $msg_log = date('[Y-m-d H:i:s]'). ' - ['. $tmp[1]. '.mp4] Processing interruption.'. "\n";
+        $log = fopen($logfile, 'a');
+        fwrite($log, $msg_log);
+        fwrite($log, $opt. " \n");
+        fclose($log);
+    };
+
     unlink("/var/www/html/entry/" . $tmp[1] . ".ent");
 
 	//exec()
