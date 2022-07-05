@@ -629,7 +629,7 @@ if(file_exists("/var/www/html/images/" . $dateStr . "/" . $dateStr . "_" . $hh .
  ?>
 <td width="10%" algin="center" style="text-align:center;">
 <!--追加部分-->
-<?php echo substr($timeStr,0,2); ?>:<?php echo sprintf('%02d',substr($timeStr,2,2)+$i); ?><br />
+<?php echo substr($timeStr,0,2); ?>:<?php echo sprintf('%02d',substr($timeStr,2,1)."0"+$i); ?><br />
 <!--追加部分-->
 <img src="<?php echo $mainImg; ?>" width="85" height="48"border=1 style="cursor:pointer;margin-left:auto;margin-right:auto;" onClick="viewImage('<?php echo $hh . $m0 . $i . "00"; ?>');">
 </td>
