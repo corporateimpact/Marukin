@@ -55,16 +55,17 @@ $mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'marukin');
 $mysqli->set_charset('utf8');
 
 //測定値テーブル抽出クエリ
-$sql = "SELECT data.days, data.times, data.water_temp, data.do, amedas_temp.air_temp, do_average.do_average, do_average.do_7days_ave
+$sql = "SELECT data.days, data.times, data.water_temp, data.do, amedas_temp.air_temp, do_average.do_average, do_average.do_7days_ave, avgs.avg_wtemp
             FROM ((data LEFT JOIN amedas_temp ON data.days = amedas_temp.days AND data.times = amedas_temp.times)
-            LEFT JOIN do_average ON data.days = do_average.days AND data.times = do_average.times)
+            LEFT JOIN do_average ON data.days = do_average.days AND data.times = do_average.times
+            LEFT JOIN (select days, times, avg(water_temp) as avg_wtemp from data group by days order by days desc, times desc) as avgs on data.days = avgs.days and data.times = avgs.times)
             WHERE data.days BETWEEN '" . $dl_date_from . "' AND '" . $dl_date_to . "' ORDER BY data.days, data.times";
 
 $res = $mysqli->query($sql);
 
 // ヘッダー作成
 
-echo "\"day\",\"time\",\"water_temp\",\"do\",\"onagawa_temp\",\"do_ave\",\"do_7days_ave\"\r\n";
+echo "\"day\",\"time\",\"water_temp\",\"do\",\"onagawa_temp\",\"water_temp_ave\",\"do_ave\",\"do_7days_ave\"\r\n";
 
 
 while ($row = $res->fetch_array()) {
@@ -73,6 +74,7 @@ while ($row = $res->fetch_array()) {
     . $row[2] . "\",\""  //水温
     . $row[3] . "\",\""  //溶存酸素
     . $row[4] . "\",\"" //気温
+    . $row[7] . "\",\"" //水温日ごと平均
     . $row[5] . "\",\"" //DO日ごと平均
     . $row[6] . "\"\r\n"); //DO7日ごと平均
 }
